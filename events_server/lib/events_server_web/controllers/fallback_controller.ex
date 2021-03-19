@@ -21,4 +21,12 @@ defmodule EventsServerWeb.FallbackController do
     |> put_view(EventsServerWeb.ErrorView)
     |> render(:"404")
   end
+
+  # This clause handles unauthorized responses
+  def call(conn, {:error, :unauthorized}) do
+    conn
+    |> put_status(:unauthorized)
+    |> put_view(EventsServerWeb.ErrorView)
+    |> render("unauthorized.json")
+  end
 end
