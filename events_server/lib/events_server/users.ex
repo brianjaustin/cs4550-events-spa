@@ -44,13 +44,13 @@ defmodule EventsServer.Users do
 
   ## Examples
 
-    iex> get_user_by_email("foo@example.com")
+    iex> get_by_email("foo@example.com")
     %User{}
 
-    iex> get_user_by_email("not_an_email")
+    iex> get_by_by_email("not_an_email")
     nil
   """
-  def get_user_by_email(email) do
+  def get_by_email(email) do
     Repo.get_by(User, email: email)
   end
 
@@ -142,15 +142,13 @@ defmodule EventsServer.Users do
 
   ## Examples
 
-    iex> valid_login?("foo@bar.com", "mySuperStr0ngP@ss")
+    iex> valid_login?(user, "mySuperStr0ngP@ss")
     true
 
-    iex> valid_login?("something", "else")
+    iex> valid_login?(user, "else")
     {:error, "invalid password"}
   """
-  def valid_login?(email, password) do
-    email
-    |> get_user_by_email()
-    |> Argon2.check_pass(password)
+  def valid_login?(user, password) do
+    Argon2.check_pass(user, password)
   end
 end

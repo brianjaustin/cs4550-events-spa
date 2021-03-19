@@ -29,6 +29,11 @@ defmodule EventsServer.UsersTest do
       assert Users.get_user!(user.id) == user
     end
 
+    test "get_by_email/1 returns the user with given email" do
+      user = user_fixture()
+      assert user == Users.get_by_email(user.email)
+    end
+
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Users.create_user(@valid_attrs)
       assert user.email == "some@email.com"
@@ -80,12 +85,12 @@ defmodule EventsServer.UsersTest do
 
     test "valid_login?/2 returns true for valid login" do
       user = user_fixture()
-      assert {:ok, _} = Users.valid_login?(user.email, "some password_hash")
+      assert {:ok, _} = Users.valid_login?(user, "some password_hash")
     end
 
     test "valid_login?/2 returns false for invalid login" do
       user = user_fixture()
-      assert {:error, _} = Users.valid_login?(user.email, "15")
+      assert {:error, _} = Users.valid_login?(user, "15")
     end
   end
 end
