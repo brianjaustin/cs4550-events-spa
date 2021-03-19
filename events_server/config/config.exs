@@ -18,6 +18,10 @@ config :events_server, EventsServerWeb.Endpoint,
   pubsub_server: EventsServer.PubSub,
   live_view: [signing_salt: "fiDar6Wg"]
 
+# Configures Argon2 hashing library (see
+# https://github.com/riverrun/comeonin/wiki/Choosing-the-password-hashing-library#argon2)
+config :argon2_elixir, t_cost: 2, m_cost: 8
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

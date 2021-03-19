@@ -19,10 +19,11 @@ defmodule EventsServerWeb.Router do
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", EventsServerWeb do
-  #   pipe_through :api
-  # end
+  scope "/api/v1", EventsServerWeb do
+     pipe_through :api
+
+     resources "/users", UserController, only: [:create, :show, :update]
+  end
 
   # Enables LiveDashboard only for development
   #

@@ -18,5 +18,9 @@ config :events_server, EventsServerWeb.Endpoint,
   http: [port: 4002],
   server: false
 
+# Configures Argon2 hashing library (see
+# https://github.com/riverrun/comeonin/wiki/Choosing-the-password-hashing-library#argon2)
+config :argon2_elixir, t_cost: 1, m_cost: 8
+
 # Print only warnings and errors during test
 config :logger, level: :warn
