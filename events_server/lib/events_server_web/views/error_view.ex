@@ -14,6 +14,10 @@ defmodule EventsServerWeb.ErrorView do
     Phoenix.Controller.status_message_from_template(template)
   end
 
+  def render("404.json", _assigns) do
+    %{errors: ["Not found"]}
+  end
+
   def render("unauthorized.json", _assigns) do
     %{errors: ["Unauthorized"]}
   end
