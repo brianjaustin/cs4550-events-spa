@@ -25,6 +25,8 @@ defmodule EventsServerWeb.Router do
      resources "/users", UserController, only: [:create, :show, :update]
      resources "/sessions", SessionController, only: [:create]
      resources "/events", EventController, except: [:new, :edit]
+     resources "/participants", EventParticipantController,
+      only: [:show, :update, :delete]
   end
 
   # Enables LiveDashboard only for development

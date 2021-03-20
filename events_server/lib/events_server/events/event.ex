@@ -3,12 +3,14 @@ defmodule EventsServer.Events.Event do
   import Ecto.Changeset
 
   alias EventsServer.Users.User
+  alias EventsServer.Events.EventParticipant
 
   schema "events" do
     field :date, :utc_datetime
     field :description, :string
     field :name, :string
     belongs_to :organizer, User
+    has_many :participants, EventParticipant
 
     timestamps()
   end

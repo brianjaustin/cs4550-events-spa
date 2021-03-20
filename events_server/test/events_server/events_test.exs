@@ -52,6 +52,20 @@ defmodule EventsServer.EventsTest do
       assert event.name == "some name"
     end
 
+    test "create_event/1 with participants creates an event and event_participants" do
+      user = user_fixture()
+      assert {:ok, %Event{} = event} = @valid_attrs
+      |> Map.put(:organizer_id, user.id)
+      |> Map.put(:participants, "foo@bar.com, baz@blah.net")
+      |> Events.create_event()
+      assert event.date == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
+      assert event.description == "some description"
+      assert event.name == "some name"
+
+      event = Repo.preload(event, :participants)
+      assert Enum.count(event.participants) == 2
+    end
+
     test "create_event/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Events.create_event(@invalid_attrs)
     end
@@ -70,6 +84,39 @@ defmodule EventsServer.EventsTest do
       assert event == Events.get_event!(event.id)
     end
 
+    test "update_event/2 adds a participant" do
+      event = event_fixture()
+      assert {:ok, %Event{} = event} = Events.update_event(event,
+        %{participants: "hi@protonmail.ch"})
+
+      event = Repo.preload(event, :participants)
+      assert Enum.count(event.participants) == 1
+      assert Enum.at(event.participants, 0).email == "hi@protonmail.ch"
+    end
+
+    test "update_event/2 with participant adds a participant" do
+      event = event_fixture()
+      assert {:ok, %Event{} = event} = Events.update_event(event,
+        %{participants: "hi@protonmail.ch"})
+      assert {:ok, %Event{} = event} = Events.update_event(event,
+        %{participants: "hi@protonmail.ch,bye@yahoo.com"})
+
+      event = Repo.preload(event, :participants)
+      assert Enum.count(event.participants) == 2
+      assert Enum.at(event.participants, 1).email == "hi@protonmail.ch"
+      assert Enum.at(event.participants, 0).email == "bye@yahoo.com"
+    end
+
+    test "update_event/2 with participant removes a participant" do
+      event = event_fixture()
+      assert {:ok, %Event{} = event} = Events.update_event(event,
+        %{participants: "hi@protonmail.ch"})
+      assert {:ok, %Event{} = event} = Events.update_event(event, %{})
+
+      event = Repo.preload(event, :participants)
+      assert Enum.count(event.participants) == 0
+    end
+
     test "delete_event/1 deletes the event" do
       event = event_fixture()
       assert {:ok, %Event{}} = Events.delete_event(event)
@@ -79,6 +126,70 @@ defmodule EventsServer.EventsTest do
     test "change_event/1 returns a event changeset" do
       event = event_fixture()
       assert %Ecto.Changeset{} = Events.change_event(event)
+    end
+  end
+
+  describe "event_participants" do
+    alias EventsServer.Events.EventParticipant
+
+    @valid_attrs %{comments: "some comments", email: "some@email.xyz", status: "unknown"}
+    @update_attrs %{comments: "some updated comments", email: "some@email.mil", status: "maybe"}
+    @invalid_attrs %{comments: nil, email: nil, status: nil}
+
+    def event_participant_fixture(attrs \\ %{}) do
+      event = event_fixture()
+
+      {:ok, event_participant} =
+        attrs
+        |> Map.put(:event_id, event.id)
+        |> Enum.into(@valid_attrs)
+        |> Events.create_event_participant()
+
+      event_participant
+    end
+
+    test "get_event_participant!/1 returns the event_participant with given id" do
+      event_participant = event_participant_fixture()
+      assert Events.get_event_participant!(event_participant.id) == event_participant
+    end
+
+    test "create_event_participant/1 with valid data creates a event_participant" do
+      event = event_fixture()
+      assert {:ok, %EventParticipant{} = event_participant} = %{event_id: event.id}
+      |> Enum.into(@valid_attrs)
+      |> Events.create_event_participant()
+      assert event_participant.comments == "some comments"
+      assert event_participant.email == "some@email.xyz"
+      assert event_participant.status == :unknown
+    end
+
+    test "create_event_participant/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Events.create_event_participant(@invalid_attrs)
+    end
+
+    test "update_event_participant/2 with valid data updates the event_participant" do
+      event_participant = event_participant_fixture()
+      assert {:ok, %EventParticipant{} = event_participant} = Events.update_event_participant(event_participant, @update_attrs)
+      assert event_participant.comments == "some updated comments"
+      assert event_participant.email == "some@email.mil"
+      assert event_participant.status == :maybe
+    end
+
+    test "update_event_participant/2 with invalid data returns error changeset" do
+      event_participant = event_participant_fixture()
+      assert {:error, %Ecto.Changeset{}} = Events.update_event_participant(event_participant, @invalid_attrs)
+      assert event_participant == Events.get_event_participant!(event_participant.id)
+    end
+
+    test "delete_event_participant/1 deletes the event_participant" do
+      event_participant = event_participant_fixture()
+      assert {:ok, %EventParticipant{}} = Events.delete_event_participant(event_participant)
+      assert_raise Ecto.NoResultsError, fn -> Events.get_event_participant!(event_participant.id) end
+    end
+
+    test "change_event_participant/1 returns a event_participant changeset" do
+      event_participant = event_participant_fixture()
+      assert %Ecto.Changeset{} = Events.change_event_participant(event_participant)
     end
   end
 end
