@@ -42,6 +42,9 @@ defmodule EventsServerWeb.EventController do
     event_params = event_params
     |> Map.put("organizer_id", conn.assigns[:current_user].id)
     with {:ok, %Event{} = event} <- Events.create_event(event_params) do
+      event = event
+      |> Repo.preload(:organizer)
+      |> Repo.preload(:participants)
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.event_path(conn, :show, event))
@@ -51,6 +54,8 @@ defmodule EventsServerWeb.EventController do
 
   def show(conn, %{"id" => id}) do
     event = Events.get_event!(id)
+    |> Repo.preload(:organizer)
+    |> Repo.preload(:participants)
     render(conn, "show.json", event: event)
   end
 
@@ -58,6 +63,9 @@ defmodule EventsServerWeb.EventController do
     event = Events.get_event!(id)
 
     with {:ok, %Event{} = event} <- Events.update_event(event, event_params) do
+      event = event
+      |> Repo.preload(:organizer)
+      |> Repo.preload(:participants)
       render(conn, "show.json", event: event)
     end
   end
