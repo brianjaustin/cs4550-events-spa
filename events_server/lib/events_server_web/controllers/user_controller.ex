@@ -6,6 +6,31 @@ defmodule EventsServerWeb.UserController do
 
   action_fallback EventsServerWeb.FallbackController
 
+  plug EventsServerWeb.Plugs.RequireToken when action in [
+    :update
+  ]
+
+  plug :require_self when action in [
+    :update
+  ]
+
+  def require_self(conn, _args) do
+    id = conn.params["id"]
+    current_user = conn.assigns[:current_user]
+
+    if "#{current_user.id}" == id do
+      conn
+    else
+      IO.inspect id
+      IO.inspect current_user
+      conn
+      |> put_status(:unauthorized)
+      |> put_view(EventsServerWeb.ErrorView)
+      |> render("unauthorized.json")
+      |> halt()
+    end
+  end
+
   def create(conn, %{"user" => user_params}) do
     with {:ok, %User{} = user} <- Users.create_user(user_params) do
       conn

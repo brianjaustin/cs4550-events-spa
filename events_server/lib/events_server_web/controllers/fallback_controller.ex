@@ -28,5 +28,6 @@ defmodule EventsServerWeb.FallbackController do
     |> put_status(:unauthorized)
     |> put_view(EventsServerWeb.ErrorView)
     |> render("unauthorized.json")
+    |> halt()
   end
 end

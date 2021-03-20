@@ -45,7 +45,7 @@ defmodule EventsServerWeb.UserControllerTest do
   end
 
   describe "update user" do
-    setup [:create_user]
+    setup [:create_user, :set_session]
 
     test "renders user when data is valid", %{conn: conn, user: %User{id: id} = user} do
       conn = put(conn, Routes.user_path(conn, :update, user), user: @update_attrs)
@@ -88,5 +88,12 @@ defmodule EventsServerWeb.UserControllerTest do
   defp create_user(_) do
     user = fixture(:user)
     %{user: user}
+  end
+
+  def set_session(%{conn: conn, user: user}) do
+    conn = put_private(conn, :phoenix_endpoint, EventsServerWeb.Endpoint)
+    token = Phoenix.Token.sign(conn, "user_id", user.id)
+    conn = put_req_header(conn, "x-auth", token)
+    %{conn: conn}
   end
 end
