@@ -26,6 +26,7 @@ defmodule EventsServerWeb.Plugs.RequireToken do
         |> put_status(:unauthorized)
         |> Phoenix.Controller.put_view(EventsServerWeb.ErrorView)
         |> Phoenix.Controller.render("unauthorized.json")
+        |> halt()
     end
   end
 end

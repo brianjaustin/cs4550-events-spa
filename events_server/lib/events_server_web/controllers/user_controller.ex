@@ -21,8 +21,6 @@ defmodule EventsServerWeb.UserController do
     if "#{current_user.id}" == id do
       conn
     else
-      IO.inspect id
-      IO.inspect current_user
       conn
       |> put_status(:unauthorized)
       |> put_view(EventsServerWeb.ErrorView)
