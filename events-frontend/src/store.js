@@ -54,6 +54,7 @@ function error(state = null, action) {
     case 'error/set':
       return action.data;
     case 'session/set':
+    case 'error/clear':
       return null;
     default:
       return state;
