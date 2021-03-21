@@ -19,7 +19,7 @@ function AppNav({session}) {
   if (session) {
     leftMenu = (
       <Nav className="ml-auto">
-        <NavLink to="/" className="nav-link">TODO: Profile</NavLink>
+        <NavLink to="/profile" className="nav-link">Profile</NavLink>
         <Nav.Link onClick={logout} className="nav-link">Logout</Nav.Link>
       </Nav>
     );

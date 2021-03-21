@@ -1,11 +1,6 @@
 /**
  * This code is based upon the demonstration in lecture, photo blog SPA.
  * See https://github.com/NatTuck/scratch-2021-01/blob/master/4550/0319/photo-blog-spa/web-ui/src/store.js.
- * 
- * State:
- * {
- *   TODO
- * }
  */
 
 import { createStore, combineReducers } from 'redux';
@@ -61,9 +56,29 @@ function error(state = null, action) {
   }
 }
 
+function info(state = null, action) {
+  switch(action.type) {
+    case 'info/set':
+      return action.data;
+    case 'info/clear':
+      return null;
+    default:
+      return state;
+  }
+}
+
+function user_form(state = {}, action) {
+  switch(action.type) {
+    case 'user_form/set':
+      return action.data;
+    default:
+      return state;
+  }
+}
+
 function root_reducer(state, action) {
   let redu = combineReducers(
-    {session, error}
+    {session, error, info, user_form}
   );
   return redu(state, action);
 }

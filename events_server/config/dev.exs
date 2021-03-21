@@ -71,5 +71,20 @@ config :phoenix, :plug_init_mode, :runtime
 config :cors_plug,
   origin: ["http://localhost:3000"],
   max_age: 86400,
-  methods: ["GET", "POST", "PATCH", "DELETE"]
+  methods: ["GET", "POST", "PATCH", "DELETE"],
+  headers: [
+    "Authorization",
+    "Content-Type",
+    "Accept",
+    "Origin",
+    "User-Agent",
+    "DNT",
+    "Cache-Control",
+    "X-Mx-ReqToken",
+    "Keep-Alive",
+    "X-Requested-With",
+    "If-Modified-Since",
+    "X-CSRF-Token",
+    "x-auth"
+  ]
 
