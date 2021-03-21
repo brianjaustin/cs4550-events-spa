@@ -47,17 +47,10 @@ function UserForm({session, error, info, user_form}) {
 
   function onSubmit(ev) {
     ev.preventDefault();
-    if (user_form?.password?.length < 10) {
-      store.dispatch({
-        type: 'error/set',
-        data: {password: ["must be at least 10 characters"]}
-      });
-    } else {
-      store.dispatch({
-        type: 'error/clear'
-      });
-      updateUser(session, user_form.name, user_form.email, user_form.password);
-    }
+    store.dispatch({
+      type: 'error/clear'
+    });
+    updateUser(session, user_form.name, user_form.email, user_form.password);
   }
 
   let status = null;

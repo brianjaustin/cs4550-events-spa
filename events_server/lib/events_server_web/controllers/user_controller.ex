@@ -47,11 +47,15 @@ defmodule EventsServerWeb.UserController do
     user = Users.get_user!(id)
 
     if not blank?(Map.get(user_params, "password")) do
-      Users.update_password(user, user_params)
-    end
-
-    with {:ok, %User{} = user} <- Users.update_user(user, user_params) do
-      render(conn, "show.json", user: user)
+      with {:ok, %User{} = user} <- Users.update_password(user, user_params) do
+        with {:ok, %User{} = user} <- Users.update_user(user, user_params) do
+          render(conn, "show.json", user: user)
+        end
+      end
+    else
+      with {:ok, %User{} = user} <- Users.update_user(user, user_params) do
+        render(conn, "show.json", user: user)
+      end
     end
   end
 

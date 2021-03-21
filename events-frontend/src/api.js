@@ -80,12 +80,12 @@ export function getUser(id) {
 export function updateUser(session, name, email, password) {
   api_patch(`users/${session.user_id}`, {user: {name, email, password}}, session.token)
     .then((data) => {
-      if (data.data.id) {
+      if (data?.data?.id) {
         store.dispatch({
           type: 'info/set',
           data: "User updated successfully."
         });
-      } else if (data.errors) {
+      } else if (data?.errors) {
         store.dispatch({
           type: 'error/set',
           data: data.errors,
