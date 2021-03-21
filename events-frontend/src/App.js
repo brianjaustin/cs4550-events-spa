@@ -1,10 +1,24 @@
+import { Container } from 'react-bootstrap';
+import { Route, Switch } from 'react-router-dom';
+
 import './App.scss';
+import AppNav from './Nav';
+import Login from './Login';
+import Register from './Register';
 
 function App() {
   return (
-    <div className="App">
-      
-    </div>
+    <Container>
+      <AppNav />
+      <Switch>
+        <Route path="/login">
+          <Login />
+        </Route>
+        <Route path="/register">
+          <Register />
+        </Route>
+      </Switch>
+    </Container>
   );
 }
 
