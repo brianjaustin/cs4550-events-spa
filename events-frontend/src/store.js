@@ -49,6 +49,7 @@ function error(state = null, action) {
     case 'error/set':
       return action.data;
     case 'session/set':
+    case 'session/clear':
     case 'error/clear':
       return null;
     default:
@@ -60,6 +61,7 @@ function info(state = null, action) {
   switch(action.type) {
     case 'info/set':
       return action.data;
+    case 'session/clear':
     case 'info/clear':
       return null;
     default:
@@ -67,10 +69,12 @@ function info(state = null, action) {
   }
 }
 
-function user_form(state = {}, action) {
+function user_form(state = {name: "", email: "", password: ""}, action) {
   switch(action.type) {
     case 'user_form/set':
       return action.data;
+    case 'session/clear':
+      return {name: "", email: "", password: ""};
     default:
       return state;
   }

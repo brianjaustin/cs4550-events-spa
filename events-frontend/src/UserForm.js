@@ -1,18 +1,63 @@
 import { Alert, Button, Form } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { useState } from 'react';
+import { useEffect } from 'react';
 
-import { updateUser } from './api';
+import store from './store';
+import { getUser, updateUser } from './api';
 
 function UserForm({session, error, info, user_form}) {
-  const [name, setName] = useState(user_form.name);
-  const [email, setEmail] = useState(user_form.email);
-  const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    if (session?.user_id) {
+      getUser(session.user_id);
+    }
+  }, [session?.user_id])
+
+  function setUser(user) {
+    store.dispatch({
+      type: 'user_form/set',
+      data: user
+    });
+  }
+
+  function setName(ev) {
+    const name = ev.target.value;
+    let tmp = Object.assign({}, user_form);
+    tmp["name"] = name;
+
+    setUser(tmp);
+  }
+
+  function setEmail(ev) {
+    const email = ev.target.value;
+    let tmp = Object.assign({}, user_form);
+    tmp["email"] = email;
+
+    setUser(tmp);
+  }
+
+  function setPassword(ev) {
+    const password = ev.target.value;
+    let tmp = Object.assign({}, user_form);
+    tmp["password"] = password;
+
+    setUser(tmp);
+  }
 
   function onSubmit(ev) {
     ev.preventDefault();
-    updateUser(session, name, email, password);
+    if (user_form?.password?.length < 10) {
+      store.dispatch({
+        type: 'error/set',
+        data: {password: ["must be at least 10 characters"]}
+      });
+    } else {
+      store.dispatch({
+        type: 'error/clear'
+      });
+      updateUser(session, user_form.name, user_form.email, user_form.password);
+    }
   }
 
   let status = null;
@@ -44,8 +89,8 @@ function UserForm({session, error, info, user_form}) {
           <Form.Label>Name</Form.Label>
           <Form.Control name="name"
                         type="text"
-                        onChange={ev => setName(ev.target.value)}
-                        value={name}
+                        onChange={setName}
+                        value={user_form?.name || ""}
                         isInvalid={error ? error.name : false} />
           <Form.Control.Feedback type="invalid">
             {error ? error.name : ""}
@@ -55,8 +100,8 @@ function UserForm({session, error, info, user_form}) {
           <Form.Label>Email</Form.Label>
           <Form.Control name="email"
                         type="email"
-                        onChange={ev => setEmail(ev.target.value)}
-                        value={email}
+                        onChange={setEmail}
+                        value={user_form?.email || ""}
                         isInvalid={error ? error.email : false} />
           <Form.Control.Feedback type="invalid">
             {error ? error.email : ""}
@@ -67,8 +112,8 @@ function UserForm({session, error, info, user_form}) {
           <Form.Control name="password"
                         type="password"
                         placeholder="Leave blank to keep the same"
-                        onChange={(ev) => setPassword(ev.target.value)}
-                        value={password}
+                        onChange={setPassword}
+                        value={user_form?.password || ""}
                         isInvalid={error ? error.password : false} />
           <Form.Control.Feedback type="invalid">
             {error ? error.password : ""}

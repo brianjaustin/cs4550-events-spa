@@ -46,7 +46,6 @@ export function login(email, password) {
         type: 'session/set',
         data: data
       });
-      getUser(data.user_id);
     } else if (data.errors) {
       store.dispatch({
         type: 'error/set',
@@ -83,10 +82,6 @@ export function updateUser(session, name, email, password) {
     .then((data) => {
       if (data.data.id) {
         store.dispatch({
-          type: 'user_form/set',
-          data: data.data
-        });
-        store.dispatch({
           type: 'info/set',
           data: "User updated successfully."
         });
@@ -96,6 +91,5 @@ export function updateUser(session, name, email, password) {
           data: data.errors,
         });
       }
-      getUser(session.user_id);
     });
 }
