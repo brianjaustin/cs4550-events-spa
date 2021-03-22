@@ -8,13 +8,14 @@ async function api_get(path) {
   return json.data;
 }
 
-async function api_post(path, data) {
+async function api_post(path, data, token) {
   let url = process.env.REACT_APP_BACKEND_URL;
 
   let options = {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'x-auth': token
     },
     body: JSON.stringify(data)
   };
@@ -92,4 +93,47 @@ export function updateUser(session, name, email, password) {
         });
       }
     });
+}
+
+export function getEvent(id) {
+  api_get(`events/${id}`).then((data) => {
+    store.dispatch({
+      type: 'event_form/set',
+      data: data
+    });
+  });
+}
+
+export function createEvent(session, name, description, date, pstring) {
+  // Python Regex from http://emailregex.com/
+  const emailPattern = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+  const isoDate = date ? date.toISOString() : null;
+  const participants = pstring.split(',').map(p => p.trim());
+
+  if (!pstring || participants.every(p => emailPattern.test(p))) {
+    store.dispatch({
+      type: 'error/clear'
+    });
+
+    api_post('events', {
+      event: {name, description, date: isoDate, participants}
+    }, session.token).then((data) => {
+      if (data.data) {
+        store.dispatch({
+          type: 'info/set',
+          data: data.data.id
+        });
+      } else if (data.errors) {
+        store.dispatch({
+          type: 'error/set',
+          data: data.errors
+        });
+      }
+    });
+  } else {
+    store.dispatch({
+      type: 'error/set',
+      data: {participants: ["must be a comma-separated list of emails"]}
+    });
+  }
 }

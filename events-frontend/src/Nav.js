@@ -9,7 +9,9 @@ function AppNav({session}) {
     store.dispatch({type: 'session/clear'});
   }
 
-  let leftMenu = (
+  let leftMenu = null;
+
+  let rightMenu = (
     <Nav className="ml-auto">
       <NavLink to="/login" className="nav-link">Login</NavLink>
       <NavLink to="/register" className="nav-link">Register</NavLink>
@@ -18,9 +20,21 @@ function AppNav({session}) {
 
   if (session) {
     leftMenu = (
+      <Nav>
+        <NavLink to="/events/create" className="nav-link">
+          Create Event
+        </NavLink>
+      </Nav>
+    );
+
+    rightMenu = (
       <Nav className="ml-auto">
-        <NavLink to="/profile" className="nav-link">Profile</NavLink>
-        <Nav.Link onClick={logout} className="nav-link">Logout</Nav.Link>
+        <NavLink to="/profile" className="nav-link">
+          Profile
+        </NavLink>
+        <Nav.Link onClick={logout} className="nav-link">
+          Logout
+        </Nav.Link>
       </Nav>
     );
   }
@@ -28,10 +42,8 @@ function AppNav({session}) {
   return (
     <Navbar bg="dark" variant="dark">
       <Navbar.Brand href="#">Events</Navbar.Brand>
-      <Nav className="mr-auto">
-
-      </Nav>
       {leftMenu}
+      {rightMenu}
     </Navbar>
   );
 }

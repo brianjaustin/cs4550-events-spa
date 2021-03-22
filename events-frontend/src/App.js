@@ -8,6 +8,8 @@ import AppNav from './Nav';
 import Login from './Login';
 import Register from './Register';
 import UserForm from './UserForm';
+import ShowEvent from './ShowEvent';
+import CreateEvent from './CreateEvent';
 
 function App() {
   // This hack is brought to you by
@@ -36,6 +38,12 @@ function App() {
         </Route>
         <Route path="/profile">
           <UserForm />
+        </Route>
+        <Route path="/events/:id(\d+)">
+          <ShowEvent />
+        </Route>
+        <Route path="/events/create">
+          <CreateEvent />
         </Route>
       </Switch>
     </Container>

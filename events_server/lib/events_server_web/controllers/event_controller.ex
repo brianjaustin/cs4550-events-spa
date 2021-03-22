@@ -35,6 +35,8 @@ defmodule EventsServerWeb.EventController do
 
   def index(conn, _params) do
     events = Events.list_events()
+    |> Repo.preload(:organizer)
+    |> Repo.preload(:participants)
     render(conn, "index.json", events: events)
   end
 

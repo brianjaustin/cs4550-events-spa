@@ -56,7 +56,7 @@ defmodule EventsServer.EventsTest do
       user = user_fixture()
       assert {:ok, %Event{} = event} = @valid_attrs
       |> Map.put(:organizer_id, user.id)
-      |> Map.put(:participants, "foo@bar.com, baz@blah.net")
+      |> Map.put(:participants, ["foo@bar.com", "baz@blah.net"])
       |> Events.create_event()
       assert event.date == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
       assert event.description == "some description"
@@ -87,7 +87,7 @@ defmodule EventsServer.EventsTest do
     test "update_event/2 adds a participant" do
       event = event_fixture()
       assert {:ok, %Event{} = event} = Events.update_event(event,
-        %{participants: "hi@protonmail.ch"})
+        %{participants: ["hi@protonmail.ch"]})
 
       event = Repo.preload(event, :participants)
       assert Enum.count(event.participants) == 1
@@ -97,9 +97,9 @@ defmodule EventsServer.EventsTest do
     test "update_event/2 with participant adds a participant" do
       event = event_fixture()
       assert {:ok, %Event{} = event} = Events.update_event(event,
-        %{participants: "hi@protonmail.ch"})
+        %{participants: ["hi@protonmail.ch"]})
       assert {:ok, %Event{} = event} = Events.update_event(event,
-        %{participants: "hi@protonmail.ch,bye@yahoo.com"})
+        %{participants: ["hi@protonmail.ch", "bye@yahoo.com"]})
 
       event = Repo.preload(event, :participants)
       assert Enum.count(event.participants) == 2
@@ -110,7 +110,7 @@ defmodule EventsServer.EventsTest do
     test "update_event/2 with participant removes a participant" do
       event = event_fixture()
       assert {:ok, %Event{} = event} = Events.update_event(event,
-        %{participants: "hi@protonmail.ch"})
+        %{participants: ["hi@protonmail.ch"]})
       assert {:ok, %Event{} = event} = Events.update_event(event, %{})
 
       event = Repo.preload(event, :participants)

@@ -154,10 +154,7 @@ defmodule EventsServer.Events do
   end
 
   defp set_event_participants(attrs, event) do
-    emails = (attrs["participants"] || attrs[:participants] || "")
-    |> String.split(",")
-    |> Enum.map(&String.trim/1)
-    |> Enum.reject(&(&1 == ""))
+    emails = (attrs["participants"] || attrs[:participants] || [])
 
     emails
     |> Enum.map(&create_event_participant(%{event_id: event.id, email: &1}))

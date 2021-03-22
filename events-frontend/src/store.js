@@ -80,9 +80,18 @@ function user_form(state = {name: "", email: "", password: ""}, action) {
   }
 }
 
+function event_form(state = {name: "", description: "", date: "", participants: []}, action) {
+  switch(action.type) {
+    case 'event_form/set':
+      return action.data;
+    default:
+      return state;
+  }
+}
+
 function root_reducer(state, action) {
   let redu = combineReducers(
-    {session, error, info, user_form}
+    {session, error, info, user_form, event_form}
   );
   return redu(state, action);
 }
