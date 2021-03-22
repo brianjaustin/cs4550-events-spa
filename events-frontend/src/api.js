@@ -82,7 +82,7 @@ export function login(email, password) {
 
 export function register(name, email, password) {
   api_post('users', {user: {name, email, password}}).then((data) => {
-    if (data.data.id) {
+    if (data.data) {
       login(email, password);
     } else if (data.errors) {
       setError(data.errors);

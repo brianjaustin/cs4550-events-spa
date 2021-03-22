@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import store from './store';
 import { getUser, updateUser } from './api';
 
-function UserForm({session, error, info, user_form}) {
+function EditUser({session, error, info, user_form}) {
 
   useEffect(() => {
     if (session?.user_id) {
@@ -78,7 +78,7 @@ function UserForm({session, error, info, user_form}) {
       {status}
       <Form onSubmit={onSubmit}>
         <h2>Edit User</h2>
-        <Form.Group controlId="UserFormName">
+        <Form.Group controlId="EditUserName">
           <Form.Label>Name</Form.Label>
           <Form.Control name="name"
                         type="text"
@@ -89,7 +89,7 @@ function UserForm({session, error, info, user_form}) {
             {error ? error.name : ""}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Group controlId="UserFormEmail">
+        <Form.Group controlId="EditUserEmail">
           <Form.Label>Email</Form.Label>
           <Form.Control name="email"
                         type="email"
@@ -100,7 +100,7 @@ function UserForm({session, error, info, user_form}) {
             {error ? error.email : ""}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Group controlId="UserFormPassword">
+        <Form.Group controlId="EditUserPassword">
           <Form.Label>Password</Form.Label>
           <Form.Control name="password"
                         type="password"
@@ -121,4 +121,4 @@ function UserForm({session, error, info, user_form}) {
 }
 
 export default connect(({session, error, info, user_form}) =>
-  ({session, error, info, user_form}))(UserForm);
+  ({session, error, info, user_form}))(EditUser);
