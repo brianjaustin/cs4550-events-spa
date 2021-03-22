@@ -6,7 +6,7 @@ defmodule EventsServer.Repo.Migrations.CreateEventParticipants do
       add :email, :string, null: false
       add :status, :string, null: false, default: "unknown"
       add :comments, :text
-      add :event_id, references(:events, on_delete: :nothing), null: false
+      add :event_id, references(:events, on_delete: :delete_all), null: false
 
       timestamps()
     end
