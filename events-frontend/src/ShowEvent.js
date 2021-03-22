@@ -5,6 +5,22 @@ import { NavLink, useParams } from 'react-router-dom'
 
 import { getEvent, deleteEvent, deleteParticipant } from './api';
 
+function StatusSummary({participants}) {
+  let counts = {yes: 0, no: 0, maybe: 0, unknown: 0}
+
+  if (participants) {
+    for(const p of participants) {
+      counts[p.status || "unknown"] += 1;
+    }
+  }
+
+  return (
+    <p>
+      {counts.yes} yes, {counts.no} no, {counts.maybe} maybe, {counts.unknown} no response.
+    </p>
+  );
+}
+
 function ShowEvent({info, error, session, event_view}) {
 
   const { id } = useParams();
@@ -101,6 +117,11 @@ function ShowEvent({info, error, session, event_view}) {
         {status}
         <h2>Event Details</h2>
         {eventControlLinks(event_view)}
+        <p>
+          Share <a href={window.location.href}>
+            {window.location.href}
+          </a> with participants so they can respond.
+        </p>
         <ul>
           <li>
             <strong>Name: </strong>
@@ -120,6 +141,7 @@ function ShowEvent({info, error, session, event_view}) {
           </li>
           <li>
             <strong>Participants:</strong>
+            <StatusSummary participants={event_view.participants} />
             <Table striped>
               <thead>
                 <tr>
