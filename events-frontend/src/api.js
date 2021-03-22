@@ -1,7 +1,9 @@
+import moment from 'moment';
+
 import store from './store';
 
 async function api_get(path) {
-  let url = process.env.REACT_APP_BACKEND_URL;
+  const url = process.env.REACT_APP_BACKEND_URL;
   let resp = await fetch(`${url}/v1/${path}`, {});
   let json = await resp.json();
 
@@ -9,7 +11,7 @@ async function api_get(path) {
 }
 
 async function api_post(path, data, token) {
-  let url = process.env.REACT_APP_BACKEND_URL;
+  const url = process.env.REACT_APP_BACKEND_URL;
 
   let options = {
     method: 'POST',
@@ -25,7 +27,7 @@ async function api_post(path, data, token) {
 }
 
 async function api_patch(path, data, token) {
-  let url = process.env.REACT_APP_BACKEND_URL;
+  const url = process.env.REACT_APP_BACKEND_URL;
 
   let options = {
     method: 'PATCH',
@@ -38,6 +40,21 @@ async function api_patch(path, data, token) {
 
   let resp = await fetch(`${url}/v1/${path}`, options);
   return await resp.json();
+}
+
+async function api_delete(path, token) {
+  const url = process.env.REACT_APP_BACKEND_URL;
+
+  let options = {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-auth': token
+    }
+  };
+
+  let resp = await fetch(`${url}/v1/${path}`, options);
+  return await resp.status;
 }
 
 export function login(email, password) {
@@ -96,7 +113,26 @@ export function updateUser(session, name, email, password) {
 }
 
 export function getEvent(id) {
+  api_get(`events/${id}`).then((data) =>
+    store.dispatch({
+      type: 'event_view/set',
+      data: data
+    })
+  );
+}
+
+export function getEditableEvent(id) {
   api_get(`events/${id}`).then((data) => {
+    if (data.participants) {
+      data["participants"] = data.participants
+        .map(p => p.email)
+        .join(",");
+    }
+
+    if (data.date) {
+      data["date"] = moment(data.date);
+    }
+
     store.dispatch({
       type: 'event_form/set',
       data: data
@@ -104,13 +140,17 @@ export function getEvent(id) {
   });
 }
 
-export function createEvent(session, name, description, date, pstring) {
+function validateParticipants(participants) {
   // Python Regex from http://emailregex.com/
   const emailPattern = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-  const isoDate = date ? date.toISOString() : null;
+  return participants.every(p => emailPattern.test(p));
+}
+
+export function createEvent(session, name, description, date, pstring) {
+  let isoDate = date.toISOString();
   const participants = pstring.split(',').map(p => p.trim());
 
-  if (!pstring || participants.every(p => emailPattern.test(p))) {
+  if (!pstring || validateParticipants(participants)) {
     store.dispatch({
       type: 'error/clear'
     });
@@ -136,4 +176,47 @@ export function createEvent(session, name, description, date, pstring) {
       data: {participants: ["must be a comma-separated list of emails"]}
     });
   }
+}
+
+export function updateEvent(session, id, name, description, date, pstring) {
+  let isoDate = date.toISOString();
+  const participants = pstring.split(',').map(p => p.trim());
+
+  if (!pstring || validateParticipants(participants)) {
+    store.dispatch({
+      type: 'error/clear'
+    });
+
+    api_patch(`events/${id}`, {event:
+      {name, description, date: isoDate, participants}
+    }, session.token).then((data) => {
+      if (data.data) {
+        store.dispatch({
+          type: 'info/set',
+          data: 'Event updated successfully'
+        });
+      } else if (data.errors) {
+        store.dispatch({
+          type: 'error/set',
+          data: data.errors
+        });
+      }
+    });
+  }
+}
+
+export function deleteEvent(session, id) {
+  api_delete(`events/${id}`, session.token).then(status => {
+    if (status !== 204) {
+      store.dispatch({
+        type: 'error/set',
+        data: 'Oops, something went wrong!'
+      });
+    } else {
+      store.dispatch({
+        type: 'info/set',
+        data: 'Event deleted successfully'
+      });
+    }
+  });
 }

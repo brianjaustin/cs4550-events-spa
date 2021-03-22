@@ -1,22 +1,11 @@
 import { Alert, Table } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom'
+import { NavLink, useParams } from 'react-router-dom'
 
-import { getEvent } from './api';
+import { getEvent, deleteEvent } from './api';
 
-function showParticipant({email, status, comments}) {
-  return (
-    <tr>
-      <td>{email}</td>
-      <td>{status}</td>
-      <td>{comments}</td>
-      <td>Edit/Delete (TODO)</td>
-    </tr>
-  );
-}
-
-function ShowEvent({event_form}) {
+function ShowEvent({info, error, session, event_view}) {
 
   const { id } = useParams();
 
@@ -34,28 +23,76 @@ function ShowEvent({event_form}) {
     }
   }
 
-  if (event_form.name) {
+  function showParticipant({email, status, comments}) {
     return (
-      <div>
+      <tr key={email}>
+        <td>{email}</td>
+        <td>{status}</td>
+        <td>{comments}</td>
+        <td>Edit/Delete (TODO)</td>
+      </tr>
+    );
+  }
+
+  function eventControlLinks(session, event) {
+    if (session.user_id === event.organizer?.id) {
+      return (
+        <>
+          <NavLink to={`/events/${event.id}/edit`}>Edit</NavLink>
+          &nbsp;
+          <a href="/" onClick={deleteClick}>Delete</a>
+        </>
+      );
+    }
+
+    return null;
+  }
+
+  function deleteClick(ev) {
+    ev.preventDefault();
+
+    if (event_view.id) {
+      deleteEvent(session, event_view.id);
+    }
+  }
+
+  if (event_view.name) {
+    let status = null;
+    if (info) {
+      status = (
+        <Alert variant="info">
+          {info}
+        </Alert>
+      );
+    } else if (error) {
+      status = (
+        <Alert variant="danger">
+          {error}
+        </Alert>
+      );
+    }
+
+    return (
+      <div className="form-container">
+        {status}
         <h2>Event Details</h2>
-        Edit (TODO)
-        Delete (TODO)
+        {eventControlLinks(session, event_view)}
         <ul>
           <li>
             <strong>Name: </strong>
-            {event_form.name}
+            {event_view.name}
           </li>
           <li>
             <strong>Organizer: </strong>
-            {event_form.organizer.name} &lt;{event_form.organizer.email}&gt;
+            {event_view.organizer.name} &lt;{event_view.organizer.email}&gt;
           </li>
           <li>
             <strong>Description: </strong>
-            {event_form.description}
+            {event_view.description}
           </li>
           <li>
             <strong>Date: </strong>
-            {formatDate(event_form.date)}
+            {formatDate(event_view.date)}
           </li>
           <li>
             <strong>Participants:</strong>
@@ -69,7 +106,7 @@ function ShowEvent({event_form}) {
                 </tr>
               </thead>
               <tbody>
-                {event_form.participants.map(showParticipant)}
+                {event_view.participants.map(showParticipant)}
               </tbody>
             </Table>
           </li>
@@ -87,4 +124,5 @@ function ShowEvent({event_form}) {
   }
 }
 
-export default connect(({event_form}) => ({event_form}))(ShowEvent);
+export default connect(({info, error, session, event_view}) =>
+  ({info, error, session, event_view}))(ShowEvent);

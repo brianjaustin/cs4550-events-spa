@@ -1,20 +1,42 @@
-import { Alert, Button, Form } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { useState } from 'react';
-import Flatpickr from "react-flatpickr";
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom'
 
-//import { createEvent } from './api';
+import { getEditableEvent, updateEvent } from './api';
+import store from './store';
+import EventForm from './EventForm';
 
-function EditEvent({error, info, session}) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
-  const [participants, setParticipants] = useState("");
+function EditEvent({error, info, session, event_form}) {
+  const { id } = useParams();
+
+  useEffect(() => {
+    getEditableEvent(id);
+  }, [id]);
+
+  function checkOrganizer() {
+    if (event_form.organizer) {
+      return event_form.organizer.id === session.user_id;
+    } else {
+      return true;
+    }
+  }
+
+  function setState(st) {
+    store.dispatch({
+      type: 'event_form/set',
+      data: st
+    });
+  }
 
   function onSubmit(ev) {
     ev.preventDefault();
-    // TODO
+    store.dispatch({
+      type: 'error/clear'
+    });
+    updateEvent(session, id, event_form.name, event_form.description,
+      event_form.date, event_form.participants);
   }
 
   let status = null;
@@ -32,7 +54,7 @@ function EditEvent({error, info, session}) {
       </Alert>
     );
   }
-  if (!session) {
+  if (!session || !checkOrganizer()) {
     status = (
       <Redirect to="/" />
     );
@@ -41,62 +63,11 @@ function EditEvent({error, info, session}) {
   return (
     <div className="form-container">
       {status}
-      <Form onSubmit={onSubmit}>
-        <h2>Edit Event</h2>
-        <Form.Group controlId="EditEventName">
-          <Form.Label>Name</Form.Label>
-          <Form.Control name="name"
-                        type="text"
-                        onChange={ev => setName(ev.target.value)}
-                        value={name}
-                        isInvalid={error ? error.name : false} />
-          <Form.Control.Feedback type="invalid">
-            {error ? error.name : ""}
-          </Form.Control.Feedback>
-        </Form.Group>
-        <Form.Group controlId="EditEventDescription">
-          <Form.Label>Description</Form.Label>
-          <Form.Control name="description"
-                        type="text"
-                        as="textarea"
-                        onChange={ev => setDescription(ev.target.value)}
-                        value={description}
-                        isInvalid={error ? error.description : false} />
-          <Form.Control.Feedback type="invalid">
-            {error ? error.description : ""}
-          </Form.Control.Feedback>
-        </Form.Group>
-        <Form.Group controlId="EditEventDate">
-          <Form.Label>Date</Form.Label>
-          <Flatpickr name="date"
-                     type="text"
-                     data-enable-time
-                     className="form-control"
-                     onChange={setDate}
-                     value={date} />
-          <Form.Control.Feedback type="invalid">
-            {error ? error.date : ""}
-          </Form.Control.Feedback>
-        </Form.Group>
-        <Form.Group controlId="EditEventParticipants">
-          <Form.Label>Participants</Form.Label>
-          <Form.Control name="particpants"
-                        type="text"
-                        placeholder="one@example.com, two@example.com"
-                        onChange={ev => setParticipants(ev.target.value)}
-                        value={participants}
-                        isInvalid={error ? error.participants : false} />
-          <Form.Control.Feedback type="invalid">
-            {error ? error.participants : ""}
-          </Form.Control.Feedback>
-        </Form.Group>
-        <Button variant="primary" type="submit">
-          Save
-        </Button>
-      </Form>
+      <h2>Edit Event</h2>
+      <EventForm error={error} onSubmit={onSubmit} setState={setState} state={event_form} />
     </div>
   );
 }
 
-export default connect(({error, info, session}) =>
-  ({error, info, session}))(EditEvent);
+export default connect(({error, info, session, event_form}) =>
+  ({error, info, session, event_form}))(EditEvent);

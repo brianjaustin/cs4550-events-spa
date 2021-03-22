@@ -10,6 +10,7 @@ import Register from './Register';
 import UserForm from './UserForm';
 import ShowEvent from './ShowEvent';
 import CreateEvent from './CreateEvent';
+import EditEvent from './EditEvent';
 
 function App() {
   // This hack is brought to you by
@@ -38,6 +39,9 @@ function App() {
         </Route>
         <Route path="/profile">
           <UserForm />
+        </Route>
+        <Route path="/events/:id(\d+)/edit">
+          <EditEvent />
         </Route>
         <Route path="/events/:id(\d+)">
           <ShowEvent />
