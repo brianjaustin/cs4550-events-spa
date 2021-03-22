@@ -57,6 +57,14 @@ async function api_delete(path, token) {
   return await resp.status;
 }
 
+function setError(data = 'Unknown error encountered.') {
+  store.dispatch({type: 'error/set', data});
+}
+
+function setInfo(data) {
+  store.dispatch({type: 'info/set', data});
+}
+
 export function login(email, password) {
   api_post('sessions', {email, password}).then((data) => {
     if (data.token) {
@@ -65,10 +73,9 @@ export function login(email, password) {
         data: data
       });
     } else if (data.errors) {
-      store.dispatch({
-        type: 'error/set',
-        data: 'Login failed'
-      });
+      setError('Login failed.');
+    } else {
+      setError();
     }
   })
 }
@@ -78,20 +85,23 @@ export function register(name, email, password) {
     if (data.data.id) {
       login(email, password);
     } else if (data.errors) {
-      store.dispatch({
-        type: 'error/set',
-        data: data.errors,
-      });
+      setError(data.errors);
+    } else {
+      setError();
     }
   });
 }
 
 export function getUser(id) {
   api_get(`users/${id}`).then((data) => {
-    store.dispatch({
-      type: 'user_form/set',
-      data: data
-    });
+    if (data.data) {
+      store.dispatch({
+        type: 'user_form/set',
+        data: data
+      });
+    } else {
+      setError('Error fetching user.');
+    }
   });
 }
 
@@ -99,26 +109,24 @@ export function updateUser(session, name, email, password) {
   api_patch(`users/${session.user_id}`, {user: {name, email, password}}, session.token)
     .then((data) => {
       if (data?.data) {
-        store.dispatch({
-          type: 'info/set',
-          data: "User updated successfully."
-        });
+        setInfo('User updated successfully.')
       } else if (data?.errors) {
-        store.dispatch({
-          type: 'error/set',
-          data: data.errors,
-        });
+        setError(data.errors);
       }
     });
 }
 
 export function getEvent(id) {
-  api_get(`events/${id}`).then((data) =>
-    store.dispatch({
-      type: 'event_view/set',
-      data: data
-    })
-  );
+  api_get(`events/${id}`).then((data) => {
+    if (data.data) {
+      store.dispatch({
+        type: 'event_view/set',
+        data: data
+      });
+    } else {
+      setError('Error fetching event.');
+    }
+  });
 }
 
 export function getEditableEvent(id) {
@@ -159,21 +167,16 @@ export function createEvent(session, name, description, date, pstring) {
       event: {name, description, date: isoDate, participants}
     }, session.token).then((data) => {
       if (data.data) {
-        store.dispatch({
-          type: 'info/set',
-          data: data.data.id
-        });
+        setInfo(data.data.id);
       } else if (data.errors) {
-        store.dispatch({
-          type: 'error/set',
-          data: data.errors
-        });
+        setError(data.errors);
+      } else {
+        setError();
       }
     });
   } else {
-    store.dispatch({
-      type: 'error/set',
-      data: {participants: ["must be a comma-separated list of emails"]}
+    setError({
+      participants: ["must be a comma-separated list of emails"]
     });
   }
 }
@@ -191,15 +194,11 @@ export function updateEvent(session, id, name, description, date, pstring) {
       {name, description, date: isoDate, participants}
     }, session.token).then((data) => {
       if (data.data) {
-        store.dispatch({
-          type: 'info/set',
-          data: 'Event updated successfully'
-        });
+        setInfo('Event updated successfully');
       } else if (data.errors) {
-        store.dispatch({
-          type: 'error/set',
-          data: data.errors
-        });
+        setError(data.errors);
+      } else {
+        setError();
       }
     });
   }
@@ -208,25 +207,23 @@ export function updateEvent(session, id, name, description, date, pstring) {
 export function deleteEvent(session, id) {
   api_delete(`events/${id}`, session.token).then(status => {
     if (status !== 204) {
-      store.dispatch({
-        type: 'error/set',
-        data: 'Oops, something went wrong!'
-      });
+      setError('Oops, something went wrong!');
     } else {
-      store.dispatch({
-        type: 'info/set',
-        data: 'Event deleted successfully'
-      });
+      setInfo('Event deleted successfully.');
     }
   });
 }
 
 export function getParticipant(id) {
   api_get(`participants/${id}`).then((data) => {
-    store.dispatch({
-      type: 'participant_form/set',
-      data: data
-    });
+    if (data.data) {
+      store.dispatch({
+        type: 'participant_form/set',
+        data: data
+      });
+    } else {
+      setError('Error fetching participant.');
+    }
   });
 }
 
@@ -234,15 +231,11 @@ export function updateParticipant(session, id, status, comments) {
   api_patch(`participants/${id}`, {event_participant: {status, comments}}, session.token)
     .then(data => {
       if (data.data) {
-        store.dispatch({
-          type: 'info/set',
-          data: 'Participant updated successfully.'
-        });
+        setInfo('Participant updated successfully.');
       } else if (data.errors) {
-        store.dispatch({
-          type: 'error/set',
-          data: data.errors
-        });
+        setError(data.errors);
+      } else {
+        setError();
       }
     });
 }
@@ -250,15 +243,9 @@ export function updateParticipant(session, id, status, comments) {
 export function deleteParticipant(session, id, event_id) {
   api_delete(`participants/${id}`, session.token).then(status => {
     if (status !== 204) {
-      store.dispatch({
-        type: 'error/set',
-        data: 'Oops, something went wrong!'
-      });
+      setError('Oops, something went wrong!');
     } else {
-      store.dispatch({
-        type: 'info/set',
-        data: 'Participant deleted successfully.'
-      });
+      setInfo('Participant deleted successfully.');
       getEvent(event_id);
     }
   });
