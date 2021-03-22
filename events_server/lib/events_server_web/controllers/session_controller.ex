@@ -9,7 +9,7 @@ defmodule EventsServerWeb.SessionController do
     with user when user != nil <- Users.get_by_email(email),
          {:ok, _} <- Users.valid_login?(user, password) do
       token = Phoenix.Token.sign(conn, "user_id", user.id)
-      render(conn, "show.json", token: token, user_id: user.id)
+      render(conn, "show.json", token: token, user: user)
     else
       _ -> {:error, :unauthorized}
     end

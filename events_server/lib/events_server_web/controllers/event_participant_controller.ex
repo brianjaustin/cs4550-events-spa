@@ -46,6 +46,7 @@ defmodule EventsServerWeb.EventParticipantController do
 
   def show(conn, %{"id" => _id}) do
     event_participant = conn.assigns[:participant]
+    |> Repo.preload(event: :organizer)
     render(conn, "show.json", event_participant: event_participant)
   end
 
@@ -53,7 +54,7 @@ defmodule EventsServerWeb.EventParticipantController do
     event_participant = conn.assigns[:participant]
 
     with {:ok, %EventParticipant{} = event_participant} <- Events.update_event_participant(event_participant, event_participant_params) do
-      render(conn, "show.json", event_participant: event_participant)
+      render(conn, "show.json", event_participant: event_participant |> Repo.preload(event: :organizer))
     end
   end
 

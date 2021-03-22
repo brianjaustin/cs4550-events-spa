@@ -11,6 +11,7 @@ import UserForm from './UserForm';
 import ShowEvent from './ShowEvent';
 import CreateEvent from './CreateEvent';
 import EditEvent from './EditEvent';
+import EditParticipant from './EditParticipant';
 
 function App() {
   // This hack is brought to you by
@@ -48,6 +49,9 @@ function App() {
         </Route>
         <Route path="/events/create">
           <CreateEvent />
+        </Route>
+        <Route path="/participants/:id">
+          <EditParticipant />
         </Route>
       </Switch>
     </Container>

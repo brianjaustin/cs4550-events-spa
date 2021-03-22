@@ -1,5 +1,6 @@
 defmodule EventsServerWeb.EventParticipantView do
   use EventsServerWeb, :view
+  alias EventsServerWeb.EventView
   alias EventsServerWeb.EventParticipantView
 
   def render("index.json", %{event_participants: event_participants}) do
@@ -11,9 +12,21 @@ defmodule EventsServerWeb.EventParticipantView do
   end
 
   def render("event_participant.json", %{event_participant: event_participant}) do
-    %{id: event_participant.id,
+    %{
+      id: event_participant.id,
       email: event_participant.email,
       status: event_participant.status,
-      comments: event_participant.comments}
+      comments: event_participant.comments,
+      event: render_one(event_participant.event, EventView, "event_brief.json")
+    }
+  end
+
+  def render("event_participant_brief.json", %{event_participant: event_participant}) do
+    %{
+      id: event_participant.id,
+      email: event_participant.email,
+      status: event_participant.status,
+      comments: event_participant.comments
+    }
   end
 end

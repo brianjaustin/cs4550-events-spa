@@ -1,5 +1,5 @@
 import { Alert } from 'react-bootstrap';
-import { Redirect } from 'react-router-dom';
+import { NavLink, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom'
@@ -44,7 +44,7 @@ function EditEvent({error, info, session, event_form}) {
   if (error) {
     status = (
       <Alert variant="danger">
-        Something went wrong. Check for errors below
+        Something went wrong. Check for errors below.
       </Alert>
     );
   } else if (info) {
@@ -65,6 +65,7 @@ function EditEvent({error, info, session, event_form}) {
       {status}
       <h2>Edit Event</h2>
       <EventForm error={error} onSubmit={onSubmit} setState={setState} state={event_form} />
+      <NavLink to={`/events/${event_form.id}`}>Back</NavLink>
     </div>
   );
 }

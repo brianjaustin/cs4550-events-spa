@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { useEffect } from 'react';
 import { NavLink, useParams } from 'react-router-dom'
 
-import { getEvent, deleteEvent } from './api';
+import { getEvent, deleteEvent, deleteParticipant } from './api';
 
 function ShowEvent({info, error, session, event_view}) {
 
@@ -23,19 +23,43 @@ function ShowEvent({info, error, session, event_view}) {
     }
   }
 
-  function showParticipant({email, status, comments}) {
+  function isOrganizer() {
+    return session?.user_id === event_view.organizer?.id;
+  }
+
+  function showParticipant({id, email, status, comments}) {
+    let editLink = <NavLink to={`/participants/${id}`}>Edit</NavLink>
+
+    let controlLinks = null;
+    if (email === session?.user_email) {
+      controlLinks = editLink;
+    } else if (isOrganizer()) {
+      controlLinks = (
+        <>
+          {editLink}
+          &nbsp;
+          <a href="/" onClick={ev => {
+            ev.preventDefault();
+            deleteParticipant(session, id, event_view.id);
+          }}>
+            Delete
+          </a>
+        </>
+      );
+    }
+
     return (
-      <tr key={email}>
+      <tr key={id}>
         <td>{email}</td>
         <td>{status}</td>
         <td>{comments}</td>
-        <td>Edit/Delete (TODO)</td>
+        <td>{controlLinks}</td>
       </tr>
     );
   }
 
-  function eventControlLinks(session, event) {
-    if (session.user_id === event.organizer?.id) {
+  function eventControlLinks(event) {
+    if (isOrganizer()) {
       return (
         <>
           <NavLink to={`/events/${event.id}/edit`}>Edit</NavLink>
@@ -76,7 +100,7 @@ function ShowEvent({info, error, session, event_view}) {
       <div className="form-container">
         {status}
         <h2>Event Details</h2>
-        {eventControlLinks(session, event_view)}
+        {eventControlLinks(event_view)}
         <ul>
           <li>
             <strong>Name: </strong>
@@ -116,8 +140,8 @@ function ShowEvent({info, error, session, event_view}) {
   } else {
     return (
       <div className="form-container">
-        <Alert variant="danger">
-          Event not found.
+        <Alert variant="info">
+          Loading event details...
         </Alert>
       </div>
     );

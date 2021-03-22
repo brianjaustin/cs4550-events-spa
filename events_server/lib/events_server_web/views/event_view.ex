@@ -20,7 +20,17 @@ defmodule EventsServerWeb.EventView do
       description: event.description,
       organizer: render_one(event.organizer, UserView, "user.json"),
       participants: render_many(event.participants,
-        EventParticipantView, "event_participant.json")
+        EventParticipantView, "event_participant_brief.json")
+    }
+  end
+
+  def render("event_brief.json", %{event: event}) do
+    %{
+      id: event.id,
+      name: event.name,
+      date: event.date,
+      description: event.description,
+      organizer: render_one(event.organizer, UserView, "user.json")
     }
   end
 end

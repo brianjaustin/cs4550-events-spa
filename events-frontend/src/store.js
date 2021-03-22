@@ -89,7 +89,7 @@ function event_view(state = {}, action) {
   }
 }
 
-function event_form(state = {name: "", description: "", date: "", participants: []}, action) {
+function event_form(state = {}, action) {
   switch(action.type) {
     case 'event_form/set':
       return action.data;
@@ -98,9 +98,21 @@ function event_form(state = {name: "", description: "", date: "", participants: 
   }
 }
 
+function participant_form(state = {status: "", comments: ""}, action) {
+  switch(action.type) {
+    case 'participant_form/set':
+      return action.data;
+    default:
+      return state;
+  }
+}
+
 function root_reducer(state, action) {
   let redu = combineReducers(
-    {session, error, info, user_form, event_view, event_form}
+    {
+      session, error, info, user_form,
+      event_view, event_form, participant_form
+    }
   );
   return redu(state, action);
 }
