@@ -67,12 +67,12 @@ function setInfo(data) {
 
 export function login(email, password) {
   api_post('sessions', {email, password}).then((data) => {
-    if (data.token) {
+    if (data?.token) {
       store.dispatch({
         type: 'session/set',
         data: data
       });
-    } else if (data.errors) {
+    } else if (data?.errors) {
       setError('Login failed.');
     } else {
       setError();
@@ -82,9 +82,9 @@ export function login(email, password) {
 
 export function register(name, email, password) {
   api_post('users', {user: {name, email, password}}).then((data) => {
-    if (data.data) {
+    if (data?.data) {
       login(email, password);
-    } else if (data.errors) {
+    } else if (data?.errors) {
       setError(data.errors);
     } else {
       setError();
@@ -94,7 +94,7 @@ export function register(name, email, password) {
 
 export function getUser(id) {
   api_get(`users/${id}`).then((data) => {
-    if (data.data) {
+    if (data) {
       store.dispatch({
         type: 'user_form/set',
         data: data
@@ -144,13 +144,13 @@ export function getEvent(id) {
 
 export function getEditableEvent(id) {
   api_get(`events/${id}`).then((data) => {
-    if (data.participants) {
+    if (data?.participants) {
       data["participants"] = data.participants
         .map(p => p.email)
         .join(",");
     }
 
-    if (data.date) {
+    if (data?.date) {
       data["date"] = moment(data.date);
     }
 
@@ -179,9 +179,9 @@ export function createEvent(session, name, description, date, pstring) {
     api_post('events', {
       event: {name, description, date: isoDate, participants}
     }, session.token).then((data) => {
-      if (data.data) {
+      if (data?.data) {
         setInfo(data.data.id);
-      } else if (data.errors) {
+      } else if (data?.errors) {
         setError(data.errors);
       } else {
         setError();
@@ -206,9 +206,9 @@ export function updateEvent(session, id, name, description, date, pstring) {
     api_patch(`events/${id}`, {event:
       {name, description, date: isoDate, participants}
     }, session.token).then((data) => {
-      if (data.data) {
+      if (data?.data) {
         setInfo('Event updated successfully');
-      } else if (data.errors) {
+      } else if (data?.errors) {
         setError(data.errors);
       } else {
         setError();
@@ -229,7 +229,7 @@ export function deleteEvent(session, id) {
 
 export function getParticipant(id) {
   api_get(`participants/${id}`).then((data) => {
-    if (data.data) {
+    if (data) {
       store.dispatch({
         type: 'participant_form/set',
         data: data
@@ -243,9 +243,9 @@ export function getParticipant(id) {
 export function updateParticipant(session, id, status, comments) {
   api_patch(`participants/${id}`, {event_participant: {status, comments}}, session.token)
     .then(data => {
-      if (data.data) {
+      if (data?.data) {
         setInfo('Participant updated successfully.');
-      } else if (data.errors) {
+      } else if (data?.errors) {
         setError(data.errors);
       } else {
         setError();
