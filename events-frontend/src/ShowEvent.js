@@ -1,7 +1,7 @@
 import { Alert, Table } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { useEffect } from 'react';
-import { NavLink, useParams } from 'react-router-dom'
+import { NavLink, useParams } from 'react-router-dom';
 
 import { getEvent, deleteEvent, deleteParticipant } from './api';
 
@@ -104,12 +104,6 @@ function ShowEvent({info, error, session, event_view}) {
           {info}
         </Alert>
       );
-    } else if (error) {
-      status = (
-        <Alert variant="danger">
-          {error}
-        </Alert>
-      );
     }
 
     return (
@@ -159,6 +153,14 @@ function ShowEvent({info, error, session, event_view}) {
         </ul>
       </div>
     )
+  } else if (error) {
+    return (
+      <div className="form-container">
+        <Alert variant="danger">
+          {error}
+        </Alert>
+      </div>
+    );
   } else {
     return (
       <div className="form-container">

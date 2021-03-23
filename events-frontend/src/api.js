@@ -116,9 +116,22 @@ export function updateUser(session, name, email, password) {
     });
 }
 
+export function getEvents() {
+  api_get('events').then((data) => {
+    if (data) {
+      store.dispatch({
+        type: 'event_list/set',
+        data: data
+      });
+    } else {
+      setError('Error fetching events.');
+    }
+  });
+}
+
 export function getEvent(id) {
   api_get(`events/${id}`).then((data) => {
-    if (data.data) {
+    if (data) {
       store.dispatch({
         type: 'event_view/set',
         data: data

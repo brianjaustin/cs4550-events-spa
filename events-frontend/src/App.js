@@ -8,6 +8,7 @@ import AppNav from './Nav';
 import Login from './Login';
 import Register from './Register';
 import EditUser from './EditUser';
+import EventList from './EventList';
 import ShowEvent from './ShowEvent';
 import CreateEvent from './CreateEvent';
 import EditEvent from './EditEvent';
@@ -32,6 +33,9 @@ function App() {
     <Container>
       <AppNav />
       <Switch>
+        <Route path="/" exact>
+          <EventList />
+        </Route>
         <Route path="/login">
           <Login />
         </Route>

@@ -41,7 +41,7 @@ function AppNav({session}) {
 
   return (
     <Navbar bg="dark" variant="dark">
-      <Navbar.Brand href="#">Events</Navbar.Brand>
+      <Navbar.Brand href="/">Events</Navbar.Brand>
       {leftMenu}
       {rightMenu}
     </Navbar>
